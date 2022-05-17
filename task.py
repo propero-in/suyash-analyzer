@@ -19,7 +19,7 @@ def open_browser(url):
     browser.click_button("Test your site")
     browser.wait_until_page_contains_element('xpath://div[@class="report-performance clear"]', 120)
 
-def Screenshot():
+def take_screenshot():
     browser.screenshot('xpath://div[@class="report-scores"]', cwd+"/output/Gtmetrix/screenshot_1.png")
     sleep(0.5)
     browser.screenshot('xpath://div[@class="report-page-details"]', cwd+"/output/Gtmetrix/screenshot_2.png")
@@ -148,25 +148,25 @@ def driver(website, email_address):
     start_time = time()
     try:
         open_browser(website)
-        Screenshot()
+        take_screenshot()
+        var = shopify_analyze_website(website)
+        score_list = ps.get_score(website)
+        res = pd.ping_analysis(website)
+        if var == 0:
+            end_time = time()
+            bot_time = end_time - start_time
+            time_taken = round(bot_time, 2)
+            WordDoc.create_document_1(website, time_taken, score_list, res)
+        else:
+            end_time = time()
+            bot_time = end_time - start_time
+            time_taken = round(bot_time, 2)
+            WordDoc.create_document_2(website, time_taken, score_list, res)
+        remove_files()
+        sleep(2)
+        browser.close_all_browsers()
+        send_mails(website, email_address)
+        remove_files()
     except Exception as e:
         browser.capture_page_screenshot(cwd+"/error.png")
         raise e
-    var = shopify_analyze_website(website)
-    score_list = ps.get_score(website)
-    res = pd.ping_analysis(website)
-    if var == 0:
-        end_time = time()
-        bot_time = end_time - start_time
-        time_taken = round(bot_time, 2)
-        WordDoc.create_document_1(website, time_taken, score_list, res)
-    else:
-        end_time = time()
-        bot_time = end_time - start_time
-        time_taken = round(bot_time, 2)
-        WordDoc.create_document_2(website, time_taken, score_list, res)
-    remove_files()
-    sleep(2)
-    browser.close_all_browsers()
-    send_mails(website, email_address)
-    remove_files()
